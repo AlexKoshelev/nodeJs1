@@ -6,10 +6,9 @@ const notesPath = path.join(__dirname, "db.json");
 async function addNote(title) {
   const notes = await getNotes();
   const note = {
-    title,
+    title: title.trim(),
     id: Date.now().toString(),
   };
-
   notes.push(note);
   await fs.writeFile(notesPath, JSON.stringify(notes));
   console.log(chalk.green.inverse("note was added"));
@@ -28,10 +27,13 @@ async function printNotes() {
 }
 async function remove(id) {
   let notes = await getNotes();
-
   const newNotes = notes.filter((note) => note.id !== id);
-  console.log(newNotes);
+  await fs.writeFile(notesPath, JSON.stringify(newNotes));
+}
 
+async function edit(id, title) {
+  const notes = await getNotes();
+  const newNotes = notes.map((note) => (note.id === id ? { title, id } : note));
   await fs.writeFile(notesPath, JSON.stringify(newNotes));
 }
 
@@ -39,4 +41,6 @@ module.exports = {
   addNote,
   printNotes,
   remove,
+  getNotes,
+  edit,
 };
